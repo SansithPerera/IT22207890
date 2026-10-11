@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Betel Leaf AI | Yield Prediction & Micro-Climate Optimization</title>
+  <style>
+    :root {
+      --green: #07543e;
+      --green-dark: #063d30;
+      --green-bright: #209b4c;
+      --mint: #eaf8ef;
+      --line: #d7ebe0;
+      --text: #17352d;
+      --muted: #63786f;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: #f6fbf8;
+      line-height: 1.55;
+    }
+    header {
+      background: var(--green-dark);
+      color: white;
+      padding: 15px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand { font-size: 1.3rem; font-weight: 800; letter-spacing: .2px; }
+    .brand span { color: #9cf0a9; }
+    nav { display: flex; gap: 24px; flex-wrap: wrap; }
+    nav a { color: white; text-decoration: none; font-size: .94rem; }
+    nav a:hover { color: #a9f3b3; }
+    .hero {
+      color: white;
+      padding: 72px 7%;
+      min-height: 330px;
+      background:
+        linear-gradient(90deg, rgba(2,39,27,.94), rgba(3,67,42,.77), rgba(3,67,42,.22)),
+        url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1800&q=85") center/cover;
+    }
+    .hero-content { max-width: 760px; }
+    .eyebrow { text-transform: uppercase; letter-spacing: 2px; color: #a8efb0; font-weight: 700; font-size: .78rem; }
+    h1 { font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.12; margin: 12px 0 18px; }
+    .hero p { max-width: 650px; font-size: 1.08rem; color: #eef8f1; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+    .btn {
+      display: inline-block; border: 0; border-radius: 9px; padding: 12px 20px;
+      font-weight: 700; text-decoration: none; cursor: pointer; font-size: .95rem;
+    }
+    .btn-primary { background: #2bb35b; color: white; }
+    .btn-primary:hover { background: #208f47; }
+    .btn-outline { border: 1px solid #d5f5df; color: white; background: transparent; }
+    .features {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;
+      padding: 28px 5%; background: white; border-bottom: 1px solid var(--line);
+    }
+    .feature { text-align: center; padding: 10px 16px; border-right: 1px solid var(--line); }
+    .feature:last-child { border-right: 0; }
+    .feature .icon { font-size: 1.8rem; color: var(--green-bright); }
+    .feature h3 { font-size: 1rem; margin: 7px 0 4px; }
+    .feature p { margin: 0; font-size: .88rem; color: var(--muted); }
+    main { max-width: 1450px; padding: 34px 5%; margin: auto; }
+    .section-heading { margin-bottom: 22px; }
+    .section-heading h2 { margin: 0 0 6px; font-size: 1.8rem; }
+    .section-heading p { color: var(--muted); margin: 0; }
+    .dashboard { display: grid; grid-template-columns: 1.05fr 1fr 1fr; gap: 18px; align-items: start; }
+    .column { display: grid; gap: 18px; }
+    .card {
+      background: white; border: 1px solid var(--line); border-radius: 14px;
+      padding: 21px; box-shadow: 0 5px 18px rgba(12, 72, 48, .045);
+    }
+    .card h3 { margin: 0 0 5px; font-size: 1.12rem; }
+    .subtext { margin: 0 0 18px; color: var(--muted); font-size: .9rem; }
+    .field { display: grid; grid-template-columns: 1fr 105px 54px; gap: 9px; align-items: center; margin: 12px 0; }
+    .field label { font-size: .9rem; }
+    .field input {
+      width: 100%; min-width: 0; padding: 10px; border: 1px solid #cfe4d8;
+      border-radius: 7px; color: var(--text); font-size: .95rem; background: #fcfffd;
+    }
+    .unit { color: var(--muted); font-size: .82rem; }
+    .full { width: 100%; margin-top: 13px; }
+    .result {
+      background: linear-gradient(120deg, #eaf9ef, #f7fff9);
+      border: 1px solid #ccebd6; border-radius: 11px; padding: 19px;
+    }
+    .result-label { color: var(--muted); font-size: .85rem; }
+    .yield-number { font-size: 2.4rem; color: var(--green); font-weight: 800; line-height: 1.2; }
+    .yield-unit { font-weight: 700; }
+    .notice { margin-top: 13px; padding: 12px; border-radius: 8px; background: #f2faf5; font-size: .88rem; color: #355c49; }
+    .climate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .climate-item { border: 1px solid var(--line); border-radius: 9px; padding: 13px; }
+    .climate-item small { display: block; color: var(--muted); }
+    .climate-item strong { color: var(--green); }
+    .chart { width: 100%; height: auto; display: block; margin-top: 12px; }
+    .bar-row { display: grid; grid-template-columns: 105px 1fr 40px; gap: 8px; align-items: center; margin: 10px 0; font-size: .82rem; }
+    .bar-bg { height: 11px; border-radius: 99px; background: #e7f3eb; overflow: hidden; }
+    .bar { height: 100%; background: linear-gradient(90deg, #67d68b, #168846); border-radius: 99px; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 34px; }
+    .info-grid .card { padding: 24px; }
+    .info-grid h3 { color: var(--green); }
+    .info-grid p, .info-grid li { color: var(--muted); font-size: .94rem; }
+    footer { margin-top: 28px; padding: 24px 5%; background: var(--green-dark); color: #e8f6ec; }
+    .footer-inner { max-width: 1450px; margin: auto; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .disclaimer { font-size: .8rem; color: #6d8277; margin-top: 12px; }
+    @media (max-width: 1050px) {
+      .features { grid-template-columns: repeat(3, 1fr); }
+      .feature { border-right: 0; }
+      .dashboard { grid-template-columns: 1fr 1fr; }
+      .dashboard > .column:last-child { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+      header { align-items: flex-start; flex-direction: column; gap: 10px; }
+      nav { gap: 15px; }
+      .hero { padding: 48px 6%; }
+      .features { grid-template-columns: 1fr 1fr; padding: 20px 4%; }
+      .dashboard, .dashboard > .column:last-child, .info-grid { grid-template-columns: 1fr; }
+      .dashboard > .column:last-child { grid-column: auto; }
+      main { padding: 26px 4%; }
+      .field { grid-template-columns: 1fr 95px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">🍃 Betel Leaf <span>AI</span></div>
+    <nav aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a href="#prediction">Prediction Demo</a>
+      <a href="#about">About Project</a>
+      <a href="#workflow">Workflow</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="eyebrow">AI for sustainable agriculture</div>
+      <h1>Betel Leaf Yield Prediction<br><span style="color:#a9f0ad">& Micro-Climate Optimization</span></h1>
+      <p>Our research project explores how artificial intelligence and farm-condition data can help betel leaf farmers estimate yield and understand environmental conditions that support healthy crop growth.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#prediction">Explore Prediction Demo</a>
+        <a class="btn btn-outline" href="#about">Learn About the Research</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" aria-label="Project highlights">
+    <div class="feature"><div class="icon">📈</div><h3>AI Yield Prediction</h3><p>Machine-learning approach using XGBoost.</p></div>
+    <div class="feature"><div class="icon">🌿</div><h3>Climate Guidance</h3><p>Explore important growing conditions.</p></div>
+    <div class="feature"><div class="icon">📱</div><h3>Farmer Friendly</h3><p>Designed around simple manual data entry.</p></div>
+    <div class="feature"><div class="icon">🧪</div><h3>Farm Readings</h3><p>Soil, nutrient and weather-related inputs.</p></div>
+    <div class="feature"><div class="icon">♻️</div><h3>Sustainable Farming</h3><p>Support informed crop-management decisions.</p></div>
+  </section>
+
+  <main>
+    <section id="prediction">
+      <div class="section-heading">
+        <h2>Farm Data & Prediction Demonstration</h2>
+        <p>Enter example field readings to explore the interface concept.</p>
+      </div>
+
+      <div class="dashboard">
+        <div class="card">
+          <h3>🌱 Input Farm Readings</h3>
+          <p class="subtext">Values below are sample inputs. Replace them with your measured field data.</p>
+          <form id="farmForm">
+            <div class="field"><label for="moisture">Soil moisture</label><input id="moisture" type="number" min="0" max="100" value="65" required><span class="unit">%</span></div>
+            <div class="field"><label for="temperature">Temperature</label><input id="temperature" type="number" min="0" max="60" step="0.1" value="28" required><span class="unit">°C</span></div>
+            <div class="field"><label for="humidity">Humidity</label><input id="humidity" type="number" min="0" max="100" value="70" required><span class="unit">%</span></div>
+            <div class="field"><label for="nitrogen">Nitrogen (N)</label><input id="nitrogen" type="number" min="0" value="45" required><span class="unit">mg/kg*</span></div>
+            <div class="field"><label for="phosphorus">Phosphorus (P)</label><input id="phosphorus" type="number" min="0" value="32" required><span class="unit">mg/kg*</span></div>
+            <div class="field"><label for="potassium">Potassium (K)</label><input id="potassium" type="number" min="0" value="40" required><span class="unit">mg/kg*</span></div>
+            <div class="field"><label for="ph">Soil pH</label><input id="ph" type="number" min="0" max="14" step="0.1" value="6.3" required><span class="unit">pH</span></div>
+            <div class="field"><label for="rainfall">Rainfall</label><input id="rainfall" type="number" min="0" value="220" required><span class="unit">mm*</span></div>
+            <button class="btn btn-primary full" type="submit">Calculate Demo Estimate</button>
+          </form>
+          <p class="disclaimer">*Units and collection periods should match the dataset and measurement method used in your research.</p>
+        </div>
+
+        <div class="column">
+          <div class="card">
+            <h3>📊 Estimated Yield Display</h3>
+            <p class="subtext">Illustrative interface output</p>
+            <div class="result" aria-live="polite">
+              <div class="result-label">Demo estimate</div>
+              <div class="yield-number"><span id="yieldValue">43</span></div>
+              <div class="yield-unit">Leaf count per bed (illustrative)</div>
+              <div class="notice" id="resultNote">This is a sample demonstration value, not a result from the trained research model.</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>☀️ Micro-Climate Reference Ranges</h3>
+            <p class="subtext">Indicative ranges used in the project exploration; validate against local agronomic guidance.</p>
+            <div class="climate-grid">
+              <div class="climate-item"><small>Temperature</small><strong>25–32 °C</strong></div>
+              <div class="climate-item"><small>Humidity</small><strong>60–75%</strong></div>
+              <div class="climate-item"><small>Soil moisture</small><strong>55–75%</strong></div>
+              <div class="climate-item"><small>Rainfall</small><strong>150–300 mm</strong></div>
+              <div class="climate-item"><small>Soil pH</small><strong>5.5–7.0</strong></div>
+              <div class="climate-item"><small>Nutrients</small><strong>N, P and K</strong></div>
+            </div>
+            <div class="notice" id="climateNote">Enter readings and select “Calculate Demo Estimate” to see a simple range check.</div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="card">
+            <h3>📉 Example Yield Trend</h3>
+            <p class="subtext">Conceptual chart only — not measured project results.</p>
+            <svg class="chart" viewBox="0 0 340 205" role="img" aria-label="Illustrative line chart showing a rising example yield trend">
+              <g stroke="#e3eee7" stroke-width="1">
+                <line x1="42" y1="25" x2="318" y2="25"/><line x1="42" y1="65" x2="318" y2="65"/>
+                <line x1="42" y1="105" x2="318" y2="105"/><line x1="42" y1="145" x2="318" y2="145"/>
+              </g>
+              <g stroke="#82998c" stroke-width="1.2"><line x1="42" y1="18" x2="42" y2="164"/><line x1="42" y1="164" x2="320" y2="164"/></g>
+              <g fill="#63786f" font-size="10"><text x="13" y="29">60</text><text x="13" y="69">45</text><text x="13" y="109">30</text><text x="13" y="149">15</text><text x="160" y="193">Sample time points</text></g>
+              <polyline points="43,142 85,127 127,111 169,101 211,80 253,59 295,40 318,31" fill="none" stroke="#209b4c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <g fill="#209b4c"><circle cx="43" cy="142" r="3.5"/><circle cx="85" cy="127" r="3.5"/><circle cx="127" cy="111" r="3.5"/><circle cx="169" cy="101" r="3.5"/><circle cx="211" cy="80" r="3.5"/><circle cx="253" cy="59" r="3.5"/><circle cx="295" cy="40" r="3.5"/><circle cx="318" cy="31" r="3.5"/></g>
+            </svg>
+          </div>
+          <div class="card">
+            <h3>🧠 Example Feature Importance</h3>
+            <p class="subtext">Illustrative visualization; confirm rankings with the final trained model.</p>
+            <div class="bar-row"><span>Moisture × Rain</span><div class="bar-bg"><div class="bar" style="width:88%"></div></div><span>High</span></div>
+            <div class="bar-row"><span>NPK features</span><div class="bar-bg"><div class="bar" style="width:76%"></div></div><span>High</span></div>
+            <div class="bar-row"><span>Soil moisture</span><div class="bar-bg"><div class="bar" style="width:68%"></div></div><span>Med.</span></div>
+            <div class="bar-row"><span>Temperature</span><div class="bar-bg"><div class="bar" style="width:55%"></div></div><span>Med.</span></div>
+            <div class="bar-row"><span>Humidity</span><div class="bar-bg"><div class="bar" style="width:46%"></div></div><span>Med.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="info-grid">
+      <article class="card">
+        <h3>🌾 The Problem</h3>
+        <p>Betel leaf yield can be affected by environmental conditions and soil nutrients. Farmers may find it difficult to combine these factors into a consistent, data-informed estimate of expected production.</p>
+      </article>
+      <article class="card">
+        <h3>🤖 Our Proposed Solution</h3>
+        <p>The research investigates an AI-based yield prediction approach using farm and climate variables. The intended system can present an estimate and useful context through a simple farmer-facing interface.</p>
+      </article>
+      <article class="card">
+        <h3>📱 Farmer-Centred Data Collection</h3>
+        <p>The proposed mobile workflow uses manual entry of readings collected with suitable instruments, rather than requiring permanently installed IoT sensors in every field.</p>
+      </article>
+    </section>
+
+    <section id="workflow" style="margin-top:34px">
+      <div class="section-heading">
+        <h2>How the Proposed System Works</h2>
+        <p>A simple workflow from farm readings to an informed decision.</p>
+      </div>
+      <div class="card">
+        <ol>
+          <li><strong>Collect readings:</strong> record soil moisture, temperature, humidity, NPK, pH and rainfall.</li>
+          <li><strong>Validate the data:</strong> check values, units and collection time before storing them.</li>
+          <li><strong>Prepare model inputs:</strong> apply the same feature names, units and preprocessing used during model training.</li>
+          <li><strong>Predict yield:</strong> send the prepared inputs to the trained XGBoost model.</li>
+          <li><strong>Present results:</strong> show the estimated leaf count per bed and explain the result clearly.</li>
+          <li><strong>Support decisions:</strong> use the prediction and verified agricultural guidance to help assess crop conditions.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div><strong>🍃 Betel Leaf AI</strong><br><small>AI-assisted yield prediction for sustainable betel cultivation</small></div>
+      <div><small>Research project · SLIIT · R26 – IT 062</small></div>
+    </div>
+  </footer>
+
+  <script>
+    // FRONT-END DEMO ONLY:
+    // This simple formula is not the trained XGBoost model and must not be used
+    // as a real agricultural prediction. Connect your actual model/API here.
+    const form = document.getElementById("farmForm");
+    const get = id => Number(document.getElementById(id).value);
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const moisture = get("moisture");
+      const temperature = get("temperature");
+      const humidity = get("humidity");
+      const nitrogen = get("nitrogen");
+      const phosphorus = get("phosphorus");
+      const potassium = get("potassium");
+      const ph = get("ph");
+      const rainfall = get("rainfall");
+
+      // Placeholder score to make the demo interactive, not a research model.
+      let demoScore = 35;
+      if (moisture >= 55 && moisture <= 75) demoScore += 3;
+      if (temperature >= 25 && temperature <= 32) demoScore += 3;
+      if (humidity >= 60 && humidity <= 75) demoScore += 2;
+      if (ph >= 5.5 && ph <= 7.0) demoScore += 2;
+      if (rainfall >= 150 && rainfall <= 300) demoScore += 2;
+      if (nitrogen > 0 && phosphorus > 0 && potassium > 0) demoScore += 1;
+
+      document.getElementById("yieldValue").textContent = demoScore;
+      document.getElementById("resultNote").textContent =
+        "Demo score only. It is generated by placeholder rules and is not produced by your trained XGBoost model.";
+
+      const checks = [
+        ["Soil moisture", moisture >= 55 && moisture <= 75],
+        ["Temperature", temperature >= 25 && temperature <= 32],
+        ["Humidity", humidity >= 60 && humidity <= 75],
+        ["Soil pH", ph >= 5.5 && ph <= 7.0],
+        ["Rainfall", rainfall >= 150 && rainfall <= 300]
+      ];
+      const inRange = checks.filter(item => item[1]).length;
+      document.getElementById("climateNote").textContent =
+        inRange + " of 5 example readings are within the displayed reference ranges. These ranges are indicative and should be verified for your local growing conditions.";
+    });
+  </script>
+</body>
+</html>
