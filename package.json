@@ -1,0 +1,24 @@
+{
+  "name": "betel-ai-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Research project website for R62-IT-062 — Intelligent Betel Leaf Management System (SLIIT). Public site + admin panel for documents, slides and photos.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "export": "node scripts/export-static.js",
+    "reset-content": "node scripts/reset-content.js",
+    "test": "node scripts/smoke-test.js"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.34.0"
+  },
+  "license": "UNLICENSED"
+}
