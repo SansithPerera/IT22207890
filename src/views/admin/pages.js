@@ -21,8 +21,8 @@ function confirmForm(ctx, action, label, message, { className = 'btn btn-small b
 function checklist(ctx) {
   const { site, data } = ctx;
   const todo = [];
-  const missingMarks = data.milestones.filter((m) => !m.marks || !m.date);
-  if (missingMarks.length) todo.push({ text: `Add the date and marks for ${missingMarks.length} milestone${missingMarks.length > 1 ? 's' : ''} (${missingMarks.map((m) => m.title).join(', ')}).`, href: '/admin/milestones' });
+  const missingDates = data.milestones.filter((m) => !m.date && !m.dateText);
+  if (missingDates.length) todo.push({ text: `Add the date for ${missingDates.length} milestone${missingDates.length > 1 ? 's' : ''} (${missingDates.map((m) => m.title).join(', ')}).`, href: '/admin/milestones' });
   const pendingDocs = data.documents.filter((d) => !hasAsset(d));
   if (pendingDocs.length) todo.push({ text: `${pendingDocs.length} document${pendingDocs.length > 1 ? 's are' : ' is'} still waiting for a file or link.`, href: '/admin/documents' });
   const pastNoSlides = data.presentations.filter((p) => !hasAsset(p) && (data.milestones.find((m) => m.id === p.milestone) || {}).status === 'completed');
@@ -79,6 +79,10 @@ function dashboardPage(ctx, { info, warnings, recent, fileCount }) {
           <div><dt>Upload limit</dt><dd>${info.maxUploadMb} MB per file${info.vercel ? ' (Vercel’s limit). Photos are shrunk before upload; for bigger documents paste a OneDrive or Google Drive link instead.' : ''}</dd></div>
         </dl>
       </section>
+    </div>
+    <div class="danger-zone">
+      <div><h2>Load the latest starter content</h2><p>Replaces all pages, milestones, documents and settings with the starter content that ships with this version of the site. Your edits are lost; uploaded files stay in the media library.</p></div>
+      ${confirmForm(ctx, '/admin/reset', 'Reset content', 'Replace ALL content with the starter content? Your edits will be lost. This cannot be undone.', { iconName: 'alert' })}
     </div>`;
   return adminLayout(ctx, { title: 'Dashboard', active: 'dashboard', content, unread });
 }
@@ -205,23 +209,25 @@ function messagesPage(ctx) {
   const content = html`
     <p class="page-intro">Messages sent from the Contact Us page.</p>
     ${msgs.length ? html`<div class="table-wrap"><table class="admin-table">
-      <thead><tr><th scope="col">From</th><th scope="col">Topic</th><th scope="col">Message</th><th scope="col">Received</th></tr></thead>
+      <thead><tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Topic</th><th scope="col">Message</th><th scope="col">Received</th></tr></thead>
       <tbody>${msgs.map((m) => html`<tr class="${m.read ? '' : 'row-unread'}">
-        <th scope="row"><a href="/admin/messages/${m.id}">${m.name}</a>${m.read ? '' : html` <span class="tag tag-in-progress">New</span>`}<br><span class="muted">${m.email}</span></th>
-        <td>${m.subject}</td><td>${truncate(m.message, 90)}</td><td class="nowrap">${formatDateTime(m.createdAt)}</td>
+        <th scope="row"><a href="/admin/messages/${m.id}">${m.name}</a>${m.read ? '' : html` <span class="tag tag-in-progress">New</span>`}${m.email ? html`<br><span class="muted">${m.email}</span>` : ''}</th>
+        <td>${m.memberName || html`<span class="muted">Whole team</span>`}</td><td>${m.subject}</td><td>${truncate(m.message, 90)}</td><td class="nowrap">${formatDateTime(m.createdAt)}</td>
       </tr>`)}</tbody></table></div>` : html`<div class="empty-admin"><p>No messages yet.</p></div>`}`;
   return adminLayout(ctx, { title: 'Messages', active: 'messages', content, unread: ctx.unread });
 }
 
 function messagePage(ctx, m) {
-  const reply = `mailto:${m.email}?subject=${encodeURIComponent(`Re: ${m.subject}`)}`;
+  // Old messages have the sender's email; new ones go to a chosen member.
+  const target = m.toEmail || m.email || '';
+  const reply = `mailto:${target}?subject=${encodeURIComponent(`${m.toEmail ? 'Website message' : 'Re'}: ${m.subject}`)}&body=${encodeURIComponent(`From: ${m.name}\n\n${m.message}`)}`;
   const content = html`
     <a class="text-link back-link" href="/admin/messages">${icon('arrowLeft', { size: 16 })}Messages</a>
     <article class="panel message">
-      <header><h2>${m.subject}</h2><p><strong>${m.name}</strong> · <a href="mailto:${m.email}">${m.email}</a> · ${formatDateTime(m.createdAt)}</p></header>
+      <header><h2>${m.subject}</h2><p><strong>${m.name}</strong>${m.email ? html` · <a href="mailto:${m.email}">${m.email}</a>` : ''}${m.memberName ? html` · to <strong>${m.memberName}</strong>${m.toEmail ? html` (<a href="mailto:${m.toEmail}">${m.toEmail}</a>)` : html` <span class="muted">(no email saved for this member)</span>`}` : ''} · ${formatDateTime(m.createdAt)}</p></header>
       <div class="message-body">${m.message}</div>
       <div class="form-actions">
-        <a class="btn btn-primary" href="${reply}">${icon('mail', { size: 17 })}Reply by email</a>
+        <a class="btn btn-primary" href="${reply}">${icon('mail', { size: 17 })}${m.toEmail ? 'Forward to member' : 'Reply by email'}</a>
         <form method="post" action="/admin/messages/${m.id}/read" class="inline-form">${csrfInput(ctx)}<button class="btn btn-ghost" type="submit">${m.read ? 'Mark as unread' : 'Mark as read'}</button></form>
         ${confirmForm(ctx, `/admin/messages/${m.id}/delete`, 'Delete', 'Delete this message?', { className: 'btn btn-danger' })}
       </div>

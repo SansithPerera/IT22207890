@@ -103,11 +103,16 @@ function dateLabel(value, fallback = 'Date to be announced') {
   return value ? formatDate(value) : fallback;
 }
 
+// A milestone's date: the text version (e.g. "January 2026") wins over the date.
+function msDate(m, opts) {
+  return m.dateText || (m.date ? formatDate(m.date, opts) : '');
+}
+
 function emptyState(text, extra = '') {
   return html`<div class="empty">${icon('leaf', { size: 22 })}<p>${text}</p>${extra}</div>`;
 }
 
 module.exports = {
   breadcrumbs, pageHeader, sectionHead, statusPill, assetActions, hasAsset, avatar, memberLine, emailLine,
-  metricRow, dateLabel, emptyState,
+  metricRow, dateLabel, msDate, emptyState,
 };

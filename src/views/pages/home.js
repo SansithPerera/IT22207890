@@ -3,7 +3,8 @@ const { html, raw, escapeHtml } = require('../../lib/html');
 const { pair, splitPipes, formatDate, youtubeId } = require('../../lib/util');
 const { icon } = require('../icons');
 const { heroArt, componentArt } = require('../illustrations');
-const { sectionHead, statusPill, avatar, memberLine, hasAsset } = require('../partials');
+const { sectionHead, statusPill, avatar, memberLine, hasAsset, msDate } = require('../partials');
+const { renderMarkdown } = require('../../lib/markdown');
 const { layout } = require('../layout');
 
 // Put "Betel Leaf" in the title in the accent italic.
@@ -138,12 +139,12 @@ function progress(ctx) {
     .sort((a, b) => String(b.date || b.updatedAt).localeCompare(String(a.date || a.updatedAt))).slice(0, 4);
   return html`<section class="section section-tint">
     <div class="wrap">
-      ${sectionHead({ eyebrow: 'Progress', title: 'Where the project stands', lead: next ? `Next assessment: ${next.title}${next.date ? ` on ${formatDate(next.date)}` : ''}.` : 'All assessments are complete.', action: html`<a class="text-link" href="/milestones">All milestones${icon('arrowRight', { size: 16 })}</a>` })}
+      ${sectionHead({ eyebrow: 'Progress', title: 'Where the project stands', lead: next ? `Next assessment: ${next.title}${msDate(next) ? ` on ${msDate(next)}` : ''}.` : 'All assessments are complete.', action: html`<a class="text-link" href="/milestones">All milestones${icon('arrowRight', { size: 16 })}</a>` })}
       <ol class="track">
         ${ms.map((m) => html`<li class="track-item track-${m.status || 'upcoming'}">
           <a href="/milestones#${m.slug}"><span class="track-dot" aria-hidden="true">${m.status === 'completed' ? icon('check', { size: 14 }) : ''}</span>
           <span class="track-title">${m.title}</span>
-          <span class="track-date">${m.date ? formatDate(m.date, { short: true }) : (m.status === 'completed' ? 'Completed' : 'Upcoming')}</span></a>
+          <span class="track-date">${msDate(m, { short: true }) || (m.status === 'completed' ? 'Completed' : 'Upcoming')}</span></a>
         </li>`)}
       </ol>
       ${latest.length ? html`<div class="latest">
@@ -197,9 +198,93 @@ function demoVideo(ctx) {
   </div></section>`;
 }
 
+// "Question | 0, 0, 1, 9, 3" -> { question, counts: [5 numbers], total, average, agree }
+function parseResult(line) {
+  const [question, nums = ''] = String(line).split('|').map((x) => x.trim());
+  const counts = nums.split(/[,\s]+/).filter(Boolean).map((n) => Math.max(0, Number(n) || 0)).slice(0, 5);
+  while (counts.length < 5) counts.push(0);
+  const total = counts.reduce((a, b) => a + b, 0);
+  const average = total ? counts.reduce((a, n, i) => a + n * (i + 1), 0) / total : 0;
+  return { question, counts, total, average, agree: counts[3] + counts[4] };
+}
+
+function fieldVisit(ctx) {
+  const { site } = ctx;
+  const results = (site.fieldVisitResults || []).map(parseResult).filter((r) => r.question && r.total);
+  if (!site.fieldVisitTitle && !results.length) return '';
+  const facts = [site.fieldVisitDate ? formatDate(site.fieldVisitDate) : '', site.fieldVisitAreas, site.fieldVisitParticipants].filter(Boolean);
+  const labels = ['Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree'];
+  return html`<section class="section">
+    <div class="wrap">
+      ${sectionHead({ eyebrow: 'Field visit', title: site.fieldVisitTitle || 'Field visit results', lead: site.fieldVisitSummary })}
+      ${facts.length ? html`<ul class="fv-facts">${facts.map((f, i) => html`<li>${icon(['calendar', 'pin', 'users'][i] || 'info', { size: 18 })}<span>${f}</span></li>`)}</ul>` : ''}
+      <div class="fv-results">${results.map((r) => {
+    const max = Math.max(...r.counts, 1);
+    return html`<article class="fv-card">
+          <h3>“${r.question}”</h3>
+          <p class="fv-score"><strong>${r.average.toFixed(2)}</strong><span>/ 5 average</span><span class="fv-agree">${Math.round((r.agree / r.total) * 100)}% agree or strongly agree</span></p>
+          <ul class="fv-bars">${r.counts.map((n, i) => html`<li><span class="fv-label">${i + 1} · ${labels[i]}</span><span class="fv-track"><span class="fv-fill" style="width:${Math.round((n / max) * 100)}%"></span></span><span class="fv-n">${n}</span></li>`)}</ul>
+          <p class="fv-note">${r.total} responses</p>
+        </article>`;
+  })}</div>
+    </div>
+  </section>`;
+}
+
+function barChart(title, lines, { highlight = /betel|2025/i } = {}) {
+  const bars = (lines || []).map((l) => { const [label, v] = String(l).split('|').map((x) => x.trim()); return { label, value: Number(v) || 0 }; }).filter((b) => b.label);
+  if (!bars.length) return '';
+  const max = Math.max(...bars.map((b) => b.value), 1);
+  return html`<figure class="why-chart">
+    <figcaption>${title}</figcaption>
+    <ul class="fv-bars why-bars">${bars.map((b) => html`<li class="${highlight.test(b.label) ? 'is-hl' : ''}"><span class="fv-label">${b.label}</span><span class="fv-track"><span class="fv-fill" style="width:${Math.max(1.5, (b.value / max) * 100).toFixed(1)}%"></span></span><span class="fv-n">${b.value.toLocaleString('en-US')}</span></li>`)}</ul>
+  </figure>`;
+}
+
+function whyBetel(ctx) {
+  const { site } = ctx;
+  if (!site.whyTitle && !(site.whyChartA || []).length) return '';
+  const sources = (site.whySources || []).map((l) => { const [name, url] = String(l).split('|').map((x) => x.trim()); return { name, url }; }).filter((x) => x.name);
+  return html`<section class="section section-tint" id="why-betel">
+    <div class="wrap why-grid">
+      <div>
+        <p class="eyebrow">Why betel</p>
+        <h2 class="section-title">${site.whyTitle || 'Why we chose betel leaf'}</h2>
+        ${site.whyText ? html`<div class="prose">${renderMarkdown(site.whyText)}</div>` : ''}
+      </div>
+      <div class="why-charts">
+        ${barChart(site.whyChartATitle, site.whyChartA, { highlight: /betel/i })}
+        ${barChart(site.whyChartBTitle, site.whyChartB, { highlight: /2025/ })}
+        ${sources.length ? html`<p class="fv-note">Sources: ${sources.map((x, i) => html`${i ? ' · ' : ''}${x.url ? html`<a href="${x.url}" target="_blank" rel="noopener">${x.name}</a>` : x.name}`)}</p>` : ''}
+      </div>
+    </div>
+  </section>`;
+}
+
+function qaResults(ctx) {
+  const { site, data } = ctx;
+  const total = Number(site.qaTotal) || 0;
+  const passed = Number(site.qaPassed) || 0;
+  const report = data.documents.find((d) => d.category === 'Testing');
+  return html`<section class="section">
+    <div class="wrap">
+      ${sectionHead({ eyebrow: 'Testing', title: 'QA testing results', lead: site.qaTypes || '' })}
+      <div class="qa-box">
+        ${total ? html`<div class="qa-stats">
+          <div><strong>${total}</strong><span>Test cases</span></div>
+          <div><strong>${passed}</strong><span>Passed</span></div>
+          <div class="qa-rate"><strong>${Math.round((passed / total) * 100)}%</strong><span>Pass rate</span></div>
+        </div>` : html`<p class="qa-pending">${icon('clock', { size: 18 })}Results will be updated soon.</p>`}
+        ${site.qaNote ? html`<p class="fv-note">${site.qaNote}</p>` : ''}
+        ${report ? html`<a class="text-link" href="/documents#testing">View the QA report${icon('arrowRight', { size: 16 })}</a>` : ''}
+      </div>
+    </div>
+  </section>`;
+}
+
 function homePage(ctx) {
   const { site } = ctx;
-  const content = html`${hero(ctx)}${stats(site)}${problem(site)}${componentCards(ctx)}${pipeline(ctx)}${demoVideo(ctx)}${collaboration(site)}${progress(ctx)}${galleryStrip(ctx)}${team(ctx)}`;
+  const content = html`${hero(ctx)}${stats(site)}${problem(site)}${whyBetel(ctx)}${componentCards(ctx)}${pipeline(ctx)}${demoVideo(ctx)}${collaboration(site)}${fieldVisit(ctx)}${qaResults(ctx)}${progress(ctx)}${galleryStrip(ctx)}${team(ctx)}`;
   return layout(ctx, { title: site.siteTitle, fullTitle: true, active: 'home', content, pageClass: 'page-home' });
 }
 

@@ -6,7 +6,7 @@
 // slug, list (one item per line), image, file, images (several images with
 // captions), ref (pick an item from another collection), boolean.
 
-const DOCUMENT_CATEGORIES = ['Project Charter', 'Proposal Documents', 'Checklist Documents', 'Final Documents', 'Research Paper', 'Other'];
+const DOCUMENT_CATEGORIES = ['TAF', 'Proposal Documents', 'Checklist Documents', 'Presentations', 'Research Papers', 'Demo Videos', 'Testing', 'Thesis', 'Other'];
 const GALLERY_CATEGORIES = ['Field visits', 'Development', 'Team', 'Events', 'Presentations'];
 const MEMBER_TYPES = ['Team member', 'Supervisor', 'Co-supervisor', 'External supervisor'];
 
@@ -63,15 +63,16 @@ const collections = {
   milestones: {
     label: 'Milestones',
     singular: 'milestone',
-    intro: 'Assessments shown on the Milestones page, with date, marks and status.',
+    intro: 'Assessments shown on the Milestones page, with date, weight and status. Use the ↑ ↓ buttons to change the order.',
     titleField: 'title',
-    listColumns: [{ field: 'date', label: 'Date', format: 'date' }, { field: 'marks', label: 'Marks' }, { field: 'status', label: 'Status', format: 'status' }],
+    listColumns: [{ field: 'date', label: 'Date', format: 'date' }, { field: 'weight', label: 'Weight' }, { field: 'status', label: 'Status', format: 'status' }],
     publicPath: (item) => `/milestones#${item.slug}`,
     fields: [
       { name: 'title', label: 'Assessment', type: 'text', required: true, maxLength: 120 },
       { name: 'slug', label: 'Anchor', type: 'slug', from: 'title' },
       { name: 'date', label: 'Date', type: 'date' },
-      { name: 'marks', label: 'Marks allocated', type: 'text', maxLength: 40, placeholder: 'e.g. 15%' },
+      { name: 'dateText', label: 'Date as text', type: 'text', maxLength: 40, placeholder: 'e.g. January 2026', help: 'Optional. Shown instead of the date when only the month is known.' },
+      { name: 'weight', label: 'Weight of the final mark', type: 'text', maxLength: 40, placeholder: 'e.g. 12%', help: 'Leave empty if this milestone has no weight.' },
       { name: 'status', label: 'Status', type: 'select', default: 'upcoming', options: [['completed', 'Completed'], ['in-progress', 'In progress'], ['upcoming', 'Upcoming']] },
       { name: 'summary', label: 'Summary', type: 'textarea', rows: 3 },
       { name: 'details', label: 'Assessment details', type: 'markdown', rows: 8 },
@@ -92,6 +93,7 @@ const collections = {
       { name: 'description', label: 'Description', type: 'textarea', rows: 2 },
       { name: 'author', label: 'Author', type: 'text', placeholder: 'Group, or a member\'s name' },
       { name: 'date', label: 'Submitted on', type: 'date' },
+      { name: 'version', label: 'Version', type: 'select', default: '', options: [['', 'Not applicable'], ['Draft', 'Draft'], ['Completed', 'Completed']], help: 'For theses and reports that are submitted as a draft first.' },
       { name: 'file', label: 'File', type: 'file' },
       { name: 'link', label: 'Or a link', type: 'url', help: 'A SharePoint or Google Drive link instead of an upload.' },
     ],
@@ -195,6 +197,44 @@ const settingsGroups = [
     fields: [
       { name: 'aboutIntro', label: 'Introduction', type: 'markdown', rows: 5 },
       { name: 'achievements', label: 'Project achievements', type: 'list', rows: 4 },
+    ],
+  },
+  {
+    title: 'Why betel (home page)',
+    fields: [
+      { name: 'whyTitle', label: 'Title', type: 'text', maxLength: 120, wide: true },
+      { name: 'whyText', label: 'Description', type: 'markdown', rows: 6 },
+      { name: 'whyChartA', label: 'Chart 1 bars', type: 'list', rows: 5, help: 'One bar per line: Label | value. Example: Tea | 1507' },
+      { name: 'whyChartATitle', label: 'Chart 1 title', type: 'text', wide: true },
+      { name: 'whyChartB', label: 'Chart 2 bars', type: 'list', rows: 4, help: 'One bar per line: Label | value' },
+      { name: 'whyChartBTitle', label: 'Chart 2 title', type: 'text', wide: true },
+      { name: 'whySources', label: 'Sources', type: 'list', rows: 3, help: 'One per line: Source name | https://link' },
+    ],
+  },
+  {
+    title: 'Field visit',
+    fields: [
+      { name: 'fieldVisitTitle', label: 'Title', type: 'text', maxLength: 120, wide: true },
+      { name: 'fieldVisitDate', label: 'Date', type: 'date' },
+      { name: 'fieldVisitAreas', label: 'Areas', type: 'text', maxLength: 160 },
+      { name: 'fieldVisitParticipants', label: 'Participants', type: 'text', maxLength: 160, wide: true, help: 'e.g. 13 participants (10 farmers, 3 local sellers)' },
+      { name: 'fieldVisitSummary', label: 'Summary', type: 'textarea', rows: 3 },
+      { name: 'fieldVisitResults', label: 'Survey results', type: 'list', rows: 4, help: 'One question per line: Question | number who chose 1, 2, 3, 4, 5. Example: I will keep using this app | 0, 0, 1, 9, 3' },
+    ],
+  },
+  {
+    title: 'QA testing (home page)',
+    fields: [
+      { name: 'qaTotal', label: 'Total test cases', type: 'number', help: 'Leave empty until the QA report is ready; the site then shows "Results will be updated soon".' },
+      { name: 'qaPassed', label: 'Passed', type: 'number' },
+      { name: 'qaTypes', label: 'Types of testing', type: 'text', wide: true, placeholder: 'Functional, validation, integration, UI' },
+      { name: 'qaNote', label: 'Note', type: 'textarea', rows: 2 },
+    ],
+  },
+  {
+    title: 'Milestones page',
+    fields: [
+      { name: 'overallGrade', label: 'Overall grade', type: 'text', maxLength: 60, placeholder: 'To be announced' },
     ],
   },
   {

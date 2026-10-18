@@ -42,7 +42,7 @@ function searchIndex(ctx) {
     const member = ctx.memberById(c.member);
     add(c.title, `/research/${c.slug}`, 'Research component', `${c.tagline} ${(c.models || []).join(' ')} ${member ? member.name : ''} ${(c.overview || []).join(' ')} ${c.results || ''}`);
   }
-  for (const m of data.milestones) add(m.title, `/milestones#${m.slug}`, 'Milestone', `${m.summary} ${m.details || ''} ${m.marks || ''}`);
+  for (const m of data.milestones) add(m.title, `/milestones#${m.slug}`, 'Milestone', `${m.summary} ${m.details || ''} ${m.weight || ''}`);
   for (const d of data.documents) add(d.title, '/documents', `Document · ${d.category}`, `${d.description} ${d.author || ''}`);
   for (const p of data.presentations) add(p.title, '/presentations', 'Presentation', p.description);
   for (const m of data.members) add(m.name, m.type === 'Team member' ? '/about#team' : '/about#supervisors', m.type, `${m.studentId} ${m.role} ${m.bio} ${m.email}`);

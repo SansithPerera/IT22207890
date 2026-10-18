@@ -10,8 +10,6 @@ const { documentsPage, presentationsPage } = require('../views/pages/documents')
 const { aboutPage } = require('../views/pages/about');
 const { contactPage, notFoundPage } = require('../views/pages/contact');
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
 function publicRoutes(router, { content }) {
   const contactLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 5 });
   const ctxFor = (req) => buildContext(content, { mode: 'server', origin: req.origin, query: req.query });
@@ -39,7 +37,7 @@ function publicRoutes(router, { content }) {
     const form = await parseForm(req, 64 * 1024);
     const values = {
       name: String(form.get('name') || '').trim().slice(0, 100),
-      email: String(form.get('email') || '').trim().slice(0, 160),
+      member: String(form.get('member') || '').trim().slice(0, 40),
       subject: String(form.get('subject') || 'General enquiry').trim().slice(0, 80),
       message: String(form.get('message') || '').trim().slice(0, 4000),
     };
@@ -47,13 +45,15 @@ function publicRoutes(router, { content }) {
     if (form.get('website')) return redirect(res, '/contact?sent=1#message');
     const errors = {};
     if (!values.name) errors.name = 'Please enter your name.';
-    if (!EMAIL_RE.test(values.email)) errors.email = 'Please enter a valid email address, like name@example.com.';
+    // The visitor picks a group member; the member's email comes from the admin panel.
+    const member = (await content.list('members')).find((m) => m.id === values.member && m.type === 'Team member');
+    if (!member) errors.member = 'Please choose the group member you want to contact.';
     if (values.message.length < 10) errors.message = 'Please write a message of at least 10 characters.';
     if (!Object.keys(errors).length && !contactLimiter.hit(req.ip)) errors._form = 'Too many messages from your connection. Please wait 15 minutes and try again.';
     if (Object.keys(errors).length) {
       return sendHtml(req, res, 422, contactPage(await ctxFor(req), { values, errors }));
     }
-    await content.addMessage({ ...values, ip: req.ip, userAgent: String(req.headers['user-agent'] || '').slice(0, 200) });
+    await content.addMessage({ ...values, memberName: member.name, toEmail: member.email || '', ip: req.ip, userAgent: String(req.headers['user-agent'] || '').slice(0, 200) });
     return redirect(res, '/contact?sent=1#message');
   });
 

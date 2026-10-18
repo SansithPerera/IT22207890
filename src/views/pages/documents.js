@@ -34,7 +34,7 @@ function documentsPage(ctx) {
     return html`<li class="doc-row${ready ? '' : ' is-pending'}">
             <span class="doc-icon" aria-hidden="true">${icon('file', { size: 22 })}</span>
             <div class="doc-main">
-              <h3>${d.title}</h3>
+              <h3>${d.title}${d.version ? html` <span class="tag tag-${d.version === 'Completed' ? 'completed' : 'in-progress'}">${d.version}</span>` : ''}</h3>
               ${d.description ? html`<p>${d.description}</p>` : ''}
               <p class="doc-meta">${[d.author, d.date ? formatDate(d.date) : ''].filter(Boolean).join(' · ')}</p>
             </div>

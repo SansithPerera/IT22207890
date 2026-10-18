@@ -1,9 +1,8 @@
 'use strict';
 const { html } = require('../../lib/html');
-const { formatDate } = require('../../lib/util');
 const { renderMarkdown } = require('../../lib/markdown');
 const { icon } = require('../icons');
-const { pageHeader, statusPill, assetActions, emptyState } = require('../partials');
+const { pageHeader, statusPill, assetActions, emptyState, msDate } = require('../partials');
 const { layout } = require('../layout');
 
 function milestonesPage(ctx) {
@@ -11,7 +10,7 @@ function milestonesPage(ctx) {
   const header = pageHeader({
     eyebrow: 'Milestones',
     title: 'Assessments and milestones',
-    lead: 'Every assessment in the research project with its date, marks and status. Choose one to see what it covered.',
+    lead: 'Every assessment in the research project with its date, weight and status. Choose one to see what it covered.',
     crumbs: [{ label: 'Home', href: '/' }, { label: 'Milestones' }],
   });
   if (!ms.length) return layout(ctx, { title: 'Milestones', active: 'milestones', content: html`${header}<div class="wrap section">${emptyState('No milestones yet.')}</div>` });
@@ -31,8 +30,8 @@ function milestonesPage(ctx) {
         ${statusPill(m.status)}
       </header>
       <dl class="ms-facts">
-        <div><dt>${icon('calendar', { size: 16 })}Date</dt><dd>${m.date ? formatDate(m.date) : 'To be announced'}</dd></div>
-        <div><dt>${icon('target', { size: 16 })}Marks allocated</dt><dd>${m.marks || 'To be confirmed'}</dd></div>
+        <div><dt>${icon('calendar', { size: 16 })}Date</dt><dd>${msDate(m) || 'To be announced'}</dd></div>
+        ${m.weight ? html`<div><dt>${icon('target', { size: 16 })}Weight</dt><dd>${m.weight} of the final mark</dd></div>` : ''}
         <div><dt>${icon('flag', { size: 16 })}Status</dt><dd>${{ completed: 'Completed', 'in-progress': 'In progress' }[m.status] || 'Upcoming'}</dd></div>
       </dl>
       ${m.summary ? html`<p class="section-lead">${m.summary}</p>` : ''}
@@ -49,19 +48,20 @@ function milestonesPage(ctx) {
         <label for="ms-select" class="mini-label">Choose an assessment</label>
         <div class="select-wrap">
           <select id="ms-select" data-ms-select>
-            ${ms.map((m) => html`<option value="${m.slug}"${m.slug === initial ? ' selected' : ''}>${m.title}${m.date ? ` — ${formatDate(m.date, { short: true })}` : ''}</option>`)}
+            ${ms.map((m) => html`<option value="${m.slug}"${m.slug === initial ? ' selected' : ''}>${m.title}${msDate(m, { short: true }) ? ` — ${msDate(m, { short: true })}` : ''}</option>`)}
           </select>
           ${icon('chevronDown', { size: 18 })}
         </div>
       </div>
       <div class="ms-panels">${panels}</div>
+      <div class="ms-grade"><span class="mini-label">${icon('target', { size: 16 })}Overall grade</span><strong>${ctx.site.overallGrade || 'To be announced'}</strong></div>
     </div>
     <aside class="ms-timeline" aria-label="Timeline">
       <p class="mini-label">Timeline · ${done} of ${ms.length} completed</p>
       <ol>
         ${ms.map((m) => html`<li class="tl-${m.status || 'upcoming'}"><a href="#${m.slug}" data-ms-link="${m.slug}">
           <span class="tl-dot" aria-hidden="true">${m.status === 'completed' ? icon('check', { size: 13 }) : ''}</span>
-          <span class="tl-text"><strong>${m.title}</strong><span>${m.date ? formatDate(m.date) : 'Date to be announced'}${m.marks ? ` · ${m.marks}` : ''}</span></span>
+          <span class="tl-text"><strong>${m.title}</strong><span>${msDate(m) || 'Date to be announced'}${m.weight ? ` · ${m.weight}` : ''}</span></span>
         </a></li>`)}
       </ol>
     </aside>

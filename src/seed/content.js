@@ -34,7 +34,8 @@ function buildSeed() {
     pp1: 'seed-ms-pp1',
     pp2: 'seed-ms-pp2',
     final: 'seed-ms-final',
-    viva: 'seed-ms-viva',
+    taf: 'seed-ms-taf',
+    thesis: 'seed-ms-thesis',
   };
 
   const settings = {
@@ -82,6 +83,21 @@ function buildSeed() {
     aboutIntro: 'We are a group of four final-year **B.Sc. (Hons) in Information Technology** undergraduates at the Sri Lanka Institute of Information Technology (SLIIT). Our research project, **R62-IT-062**, applies computer vision and machine learning to betel cultivation, and each member owns one component of the shared mobile application.',
     achievements: [],
     contactEmail: '',
+    overallGrade: 'To be announced',
+    qaTotal: '', qaPassed: '', qaTypes: 'Functional, validation, integration and UI testing', qaNote: 'The full QA report is on the Documents page.',
+    whyTitle: 'Why we chose betel leaf',
+    whyText: 'Betel is a **foreign-exchange crop** grown mostly by smallholder farmers. Its export price depends on leaf quality, yet grading, disease and pest checks are still done by eye.\n\n- Exports to Pakistan, the main market, earned **US$ 13.39 million in 2025**, up from US$ 9.27 million in 2024 but still below US$ 17.77 million in 2019, so there is room to grow.\n- The area under betel cultivation grew **44% to 1,676 hectares** by 2025.\n- Tea, rubber and coconut have research institutes and digital tools; betel farmers have almost none.\n- The same approach can later cover larger spice exports such as **cinnamon and pepper**.',
+    whyChartATitle: 'Sri Lanka agricultural export earnings, 2025 (US$ million)',
+    whyChartA: ['Tea | 1507', 'Coconut products | 1233', 'Rubber products | 946', 'Spices & essential oils | 450', 'Betel leaves (Pakistan) | 13.4'],
+    whyChartBTitle: 'Betel leaf exports to Pakistan (US$ million)',
+    whyChartB: ['2019 | 17.77', '2024 | 9.27', '2025 | 13.39'],
+    whySources: ['Daily FT – Export earnings up 5.6% to $17.2 b in 2025 | https://www.ft.lk/top-story/Export-earnings-up-5-6-to-17-2-b-in-2025/26-787471', 'NewKerala – Sri Lanka\'s betel exports and Pakistani tariffs (Sep 2026) | https://www.newkerala.com/news/a/sri-lankas-betel-exports-slump-amidst-pakistani-tariffs-992.htm'],
+    fieldVisitTitle: 'Field visit and app evaluation',
+    fieldVisitDate: '2026-10-09',
+    fieldVisitAreas: 'Narammala and Kuliyapitiya',
+    fieldVisitParticipants: '13 participants (10 farmers, 3 local sellers)',
+    fieldVisitSummary: 'We met betel farmers and local sellers, demonstrated the Betel Management App and collected their feedback with a short survey (1 = strongly disagree, 5 = strongly agree).',
+    fieldVisitResults: ['I will keep using this app | 0, 0, 1, 9, 3', 'I would recommend this app to other farmers | 0, 0, 0, 6, 7'],
     contactPhone: '',
     address: 'Sri Lanka Institute of Information Technology (SLIIT)\nNew Kandy Road, Malabe, Sri Lanka',
     emailTemplateSubject: '[R62-IT-062] Enquiry about the Intelligent Betel Leaf Management System',
@@ -125,6 +141,25 @@ function buildSeed() {
   ]);
 
   const domain = stamp([
+    {
+      id: 'seed-domain-why-betel', title: 'Why Betel Leaf?', slug: 'why-betel-leaf',
+      summary: 'Betel is a foreign-exchange crop grown by smallholders, where the export price depends on leaf quality.',
+      body: [
+        'Sri Lanka exports betel leaves mainly to Pakistan. These exports earned **US$ 13.39 million in 2025**, up from US$ 9.27 million in 2024 but still below **US$ 17.77 million in 2019**, so there is room to recover and grow. The area under betel cultivation grew **44% to 1,676 hectares** by 2025.',
+        'Yet grading, disease and pest checks are still done by eye, and yield is not planned with data. Better, consistent quality protects export earnings and farmer income, which is what this system supports.',
+        '| Agricultural export (2025) | Earnings | Change vs 2024 |\n|---|---|---|\n| Tea | US$ 1,507 million | +5.0% |\n| Coconut and coconut products | US$ 1,233 million | +42.7% |\n| Rubber and rubber products | US$ 946 million | −5.6% |\n| Spices and essential oils | US$ 450 million | −2.6% |\n| Betel leaves (to Pakistan) | US$ 13.4 million | +44.4% |',
+        'Sources: [Daily FT, export earnings 2025](https://www.ft.lk/top-story/Export-earnings-up-5-6-to-17-2-b-in-2025/26-787471) · [NewKerala, betel exports and Pakistani tariffs (Sep 2026)](https://www.newkerala.com/news/a/sri-lankas-betel-exports-slump-amidst-pakistani-tariffs-992.htm) · [EDB Pakistan market profile](https://www.srilankabusiness.com/exporters/market-profiles/pakistan.html)',
+      ].join('\n\n'),
+      items: [
+        'Earns foreign exchange | Betel is an export crop; Pakistan is the main market.',
+        'Quality sets the price | Buyers pay by grade, but grading is manual and subjective. Consistent grading means fewer rejections.',
+        'A growing crop | Cultivated area grew 44% to 1,676 ha by 2025, so more farmers need support.',
+        'Smallholder farmers | Losses from disease, pests and poor planning hit small farmers hardest; few can afford experts or IoT sensors.',
+        'No digital tools yet | Unlike tea or rubber, betel has almost no AI or mobile tools.',
+        'Can extend to other crops | The same approach can later cover cinnamon and pepper, part of the US$ 450 million spice export sector.',
+      ],
+      itemsStyle: 'cards', image: null, imageCaption: '',
+    },
     {
       id: 'seed-domain-literature', title: 'Literature Survey', slug: 'literature-survey',
       summary: 'What existing research says about image-based crop diagnosis, pest detection, yield prediction and reliable deployment in the field.',
@@ -435,55 +470,67 @@ function buildSeed() {
 
   const milestones = stamp([
     {
-      id: ids.proposal, title: 'Project Proposal', slug: 'project-proposal', date: '', marks: '', status: 'completed',
-      summary: 'Proposal presentation and report introducing the research problem, objectives, methodology and the four components.',
-      details: '', deliverables: ['Proposal presentation', 'Proposal report'],
+      id: ids.taf, title: 'TAF Submission', slug: 'taf-submission', date: '2026-01-01', dateText: 'January 2026', weight: '', status: 'completed',
+      summary: 'Topic Assessment Form submitted to register the research topic, the group and the supervisors.',
+      details: '', deliverables: ['TAF document'],
     },
     {
-      id: ids.pp1, title: 'Progress Presentation 1', slug: 'progress-presentation-1', date: '', marks: '', status: 'completed',
+      id: ids.proposal, title: 'Proposal Presentation', slug: 'proposal-presentation', date: '2026-03-16', weight: '12%', status: 'completed',
+      summary: 'Proposal presentation and documents introducing the research problem, objectives, methodology and the four components.',
+      details: '', deliverables: ['Project proposal presentation', 'Project proposal document (each member)'],
+    },
+    {
+      id: ids.pp1, title: 'Progress Presentation 1', slug: 'progress-presentation-1', date: '2026-05-11', weight: '15%', status: 'completed',
       summary: 'First progress review of each component\'s models and early implementation.',
       details: 'The panel set the target of reaching **90% system completion by PP2**. Component-level feedback and how it was addressed is listed on each research component page.',
-      deliverables: ['Progress presentation slides', 'Working demonstration of each component'],
+      deliverables: ['Progress Presentation 1 slides', 'Checklist 1'],
     },
     {
-      id: ids.pp2, title: 'Progress Presentation 2', slug: 'progress-presentation-2', date: '2026-09-01', marks: '', status: 'completed',
+      id: ids.pp2, title: 'Progress Presentation 2', slug: 'progress-presentation-2', date: '2026-09-01', weight: '18%', status: 'completed',
       summary: 'All four components shown as working Flutter app features with on-device ONNX inference and OOD verification.',
       details: 'Each member presented the PP1 feedback for their component, the improvements made since, the end-to-end workflow and results from the mobile app. The group also covered business potential, commercialisation and ethical considerations.',
-      deliverables: ['Progress Presentation 2 slides', 'Mobile app demonstration'],
+      deliverables: ['Progress Presentation 2 slides', 'Demo Video 1', 'Research paper (each member)'],
     },
     {
-      id: ids.final, title: 'Final Assessment', slug: 'final-assessment', date: '', marks: '', status: 'upcoming',
-      summary: 'Final presentation and demonstration of the complete, integrated system, with final reports, research paper and this website.',
-      details: '', deliverables: ['Final presentation', 'Final reports (group and individual)', 'Research paper', 'Project website'],
+      id: ids.final, title: 'Final Assessment', slug: 'final-assessment', date: '2026-10-19', weight: '20%', status: 'upcoming',
+      summary: 'Final presentation, viva and demonstration of the complete, integrated system.',
+      details: '', deliverables: ['Final viva presentation', 'Checklist 2', 'Project website'],
     },
     {
-      id: ids.viva, title: 'Viva', slug: 'viva', date: '', marks: '', status: 'upcoming',
-      summary: 'Individual viva on each member\'s component and contribution.',
-      details: '', deliverables: [],
+      id: ids.thesis, title: 'Final Thesis Submission', slug: 'final-thesis-submission', date: '2026-10-28', weight: '19%', status: 'upcoming',
+      summary: 'Submission of the individual theses and the group thesis.',
+      details: '', deliverables: ['Project thesis (individual)', 'Project thesis (group)'],
     },
   ]);
 
+  const people = [['Thathsara Y P G S', 'thathsara'], ['Perera A L S R', 'perera'], ['Senanayake H R K G', 'senanayake'], ['Fernando M N S', 'fernando']];
+  const doc = (id, title, category, extra = {}) => ({ id, title, category, description: '', author: 'Group', date: '', version: '', file: null, link: '', ...extra });
+  const each = (key, title, category, extra = {}) => people.map(([name, slug]) => doc(`seed-doc-${key}-${slug}`, `${title} — ${name}`, category, { author: name, ...extra }));
   const documents = stamp([
-    { id: 'seed-doc-charter', title: 'Project Charter', category: 'Project Charter', description: 'Scope, team, timeline and responsibilities agreed at the start of the project.', author: 'Group', date: '', file: null, link: '' },
-    { id: 'seed-doc-proposal', title: 'Project Proposal Document', category: 'Proposal Documents', description: 'Research problem, objectives, methodology and plan.', author: 'Group', date: '', file: null, link: '' },
-    { id: 'seed-doc-checklist', title: 'Checklist Documents', category: 'Checklist Documents', description: 'Checklists submitted with each assessment.', author: 'Group', date: '', file: null, link: '' },
-    { id: 'seed-doc-final-main', title: 'Final Report — Group', category: 'Final Documents', description: 'Main report covering the complete integrated system.', author: 'Group', date: '', file: null, link: '' },
-    { id: 'seed-doc-final-quality', title: 'Final Report — Quality Grading & Export Verification', category: 'Final Documents', description: 'Individual report.', author: 'Thathsara Y P G S', date: '', file: null, link: '' },
-    { id: 'seed-doc-final-yield', title: 'Final Report — Yield Prediction & Micro-Climate Optimization', category: 'Final Documents', description: 'Individual report.', author: 'Perera A L S R', date: '', file: null, link: '' },
-    { id: 'seed-doc-final-disease', title: 'Final Report — Disease Detection & Management Advisory', category: 'Final Documents', description: 'Individual report.', author: 'Senanayake H R K G', date: '', file: null, link: '' },
-    { id: 'seed-doc-final-pest', title: 'Final Report — Pest Detection & Integrated Pest Management', category: 'Final Documents', description: 'Individual report.', author: 'Fernando M N S', date: '', file: null, link: '' },
-    { id: 'seed-doc-paper', title: 'Research Paper', category: 'Research Paper', description: 'Paper describing the system and its results.', author: 'Group', date: '', file: null, link: '' },
+    doc('seed-doc-taf', 'TAF Document', 'TAF', { description: 'Topic Assessment Form.', date: '' }),
+    ...each('proposal', 'Project Proposal Document', 'Proposal Documents', { description: 'Individual project proposal.' }),
+    doc('seed-doc-checklist-1', 'Checklist 1', 'Checklist Documents', { date: '2026-05-13' }),
+    doc('seed-doc-proposal-pres', 'Project Proposal Presentation', 'Presentations', { date: '2026-03-16' }),
+    doc('seed-doc-pp1', 'Progress Presentation 1', 'Presentations', { date: '2026-05-11' }),
+    ...each('paper', 'Research Paper', 'Research Papers'),
+    doc('seed-doc-pp2', 'Progress Presentation 2', 'Presentations', { date: '2026-09-01', file: staticFile('/media/slides/R62-IT-062-PP2.pdf') }),
+    doc('seed-doc-demo-1', 'Demo Video 1', 'Demo Videos', { date: '2026-08-31', description: 'Demonstration of the mobile app.' }),
+    doc('seed-doc-qa-report', 'QA Test Report', 'Testing', { description: 'Test cases and results for all four components and the app. Results will be updated.' }),
+    doc('seed-doc-checklist-2', 'Checklist 2', 'Checklist Documents', { date: '2026-10-14' }),
+    ...each('thesis', 'Project Thesis (Individual)', 'Thesis', { version: 'Draft' }),
+    doc('seed-doc-thesis-group', 'Project Thesis (Group)', 'Thesis', { version: 'Draft' }),
+    doc('seed-doc-final-viva', 'Final Viva Presentation', 'Presentations', { date: '2026-10-19' }),
   ]);
 
   const presentations = stamp([
-    { id: 'seed-pres-proposal', title: 'Proposal Presentation', milestone: ids.proposal, date: '', description: 'Problem, objectives, methodology and the four components.', file: null, link: '', video: '', thumbnail: null },
-    { id: 'seed-pres-pp1', title: 'Progress Presentation 1', milestone: ids.pp1, date: '', description: 'Models and early implementation for each component.', file: null, link: '', video: '', thumbnail: null },
+    { id: 'seed-pres-proposal', title: 'Proposal Presentation', milestone: ids.proposal, date: '2026-03-16', description: 'Problem, objectives, methodology and the four components.', file: null, link: '', video: '', thumbnail: null },
+    { id: 'seed-pres-pp1', title: 'Progress Presentation 1', milestone: ids.pp1, date: '2026-05-11', description: 'Models and early implementation for each component.', file: null, link: '', video: '', thumbnail: null },
     {
       id: 'seed-pres-pp2', title: 'Progress Presentation 2', milestone: ids.pp2, date: '2026-09-01',
       description: 'Working Flutter app with all four components, PP1 feedback and improvements, results, business potential and ethics.',
       file: staticFile('/media/slides/R62-IT-062-PP2.pdf'), link: '', video: '', thumbnail: staticFile('/media/slides/pp2-cover.webp'),
     },
-    { id: 'seed-pres-final', title: 'Final Presentation', milestone: ids.final, date: '', description: 'Final demonstration of the complete, integrated system.', file: null, link: '', video: '', thumbnail: null },
+    { id: 'seed-pres-final', title: 'Final Viva Presentation', milestone: ids.final, date: '2026-10-19', description: 'Final demonstration of the complete, integrated system.', file: null, link: '', video: '', thumbnail: null },
   ]);
 
   const gallery = stamp([

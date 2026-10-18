@@ -60,7 +60,7 @@ const config = {
   dataDir: path.resolve(ROOT, env.DATA_DIR || (onVercel ? path.join(os.tmpdir(), 'betel-data') : 'data')),
   // Admin login
   adminUser: (env.ADMIN_USERNAME || 'admin').trim(),
-  adminPassword: adminPasswordFromEnv || (isProduction ? '' : 'betel-admin'),
+  adminPassword: adminPasswordFromEnv || (isProduction ? '' : '1234'),
   usingDefaultPassword: !adminPasswordFromEnv,
   sessionSecret: sessionSecret.value,
   sessionSecretIsRandom: sessionSecret.source === 'random',

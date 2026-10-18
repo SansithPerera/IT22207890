@@ -70,7 +70,7 @@ const PDF = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n');
   console.log(`Smoke test against ${base} (${store.info().label})\n`);
 
   console.log('Public site');
-  for (const [url, needle] of [['/', 'Intelligent'], ['/domain', 'Literature Survey'], ['/research/quality-grading', 'EfficientNet-B0'], ['/research/yield-prediction', '94.48%'], ['/milestones', 'Progress Presentation 2'], ['/documents', 'Project Charter'], ['/presentations', 'R62-IT-062-PP2.pdf'], ['/about', 'Thathsara Y P G S'], ['/contact', 'Email template']]) {
+  for (const [url, needle] of [['/', 'Intelligent'], ['/domain', 'Literature Survey'], ['/research/quality-grading', 'EfficientNet-B0'], ['/research/yield-prediction', '94.48%'], ['/milestones', 'Progress Presentation 2'], ['/documents', 'TAF Document'], ['/presentations', 'R62-IT-062-PP2.pdf'], ['/about', 'Thathsara Y P G S'], ['/contact', 'Email template']]) {
     await check(`GET ${url}`, async () => {
       const r = await req('GET', url);
       assert.strictEqual(r.status, 200);
@@ -90,12 +90,12 @@ const PDF = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n');
 
   console.log('\nContact form');
   await check('invalid message is rejected', async () => {
-    const r = await req('POST', '/contact', { body: new URLSearchParams({ name: '', email: 'nope', message: 'hi' }) });
+    const r = await req('POST', '/contact', { body: new URLSearchParams({ name: '', member: '', message: 'hi' }) });
     assert.strictEqual(r.status, 422);
-    assert.ok(r.text.includes('valid email'));
+    assert.ok(r.text.includes('choose the group member'));
   });
   await check('valid message is stored', async () => {
-    const r = await req('POST', '/contact', { body: new URLSearchParams({ name: 'Nimal Perera', email: 'nimal@example.com', subject: 'Collaboration', message: 'We would like to test the grading app at our packing house.' }) });
+    const r = await req('POST', '/contact', { body: new URLSearchParams({ name: 'Nimal Perera', member: 'seed-member-perera', subject: 'Collaboration', message: 'We would like to test the grading app at our packing house.' }) });
     assert.strictEqual(r.status, 303);
     assert.strictEqual(r.headers.get('location'), '/contact?sent=1#message');
   });

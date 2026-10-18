@@ -27,7 +27,7 @@ npm start
 ```
 
 Open http://localhost:3000. The admin panel is at http://localhost:3000/admin — in development the
-login is **admin / betel-admin**.
+login is **admin / 1234**. On Vercel, set `ADMIN_USERNAME=admin` and `ADMIN_PASSWORD` in the environment variables.
 
 Everything you change locally is saved in the `data/` folder (content in `data/content.json`, uploads
 in `data/uploads/`). Delete that folder to start again from the starter content.
@@ -143,7 +143,7 @@ npm run export -- --live=https://it22207890.vercel.app
 | Variable | Default | Purpose |
 |---|---|---|
 | `ADMIN_USERNAME` | `admin` | Admin sign-in name |
-| `ADMIN_PASSWORD` | `betel-admin` in development, none in production | Admin password. Production sign-in is disabled until this is set |
+| `ADMIN_PASSWORD` | `1234` in development, none in production | Admin password. Production sign-in is disabled until this is set |
 | `SESSION_SECRET` | derived from `ADMIN_PASSWORD`, else random | Signs the admin cookie. Set it in production |
 | `DATABASE_URL` | — | PostgreSQL connection string (`POSTGRES_URL` also works). Without it, content is stored in `DATA_DIR` |
 | `DATA_DIR` | `data` (`/tmp/betel-data` on Vercel) | Folder for local content and uploads |

@@ -13,7 +13,7 @@ function contactForm(ctx, { values = {}, errors = {}, sent = false } = {}) {
   }
   return html`<div class="form-card" id="message">
     <h2 class="card-title">Send us a message</h2>
-    ${sent ? html`<p class="notice notice-ok" role="status">${icon('check', { size: 18 })}Thank you. Your message reached the team and we will reply by email.</p>` : ''}
+    ${sent ? html`<p class="notice notice-ok" role="status">${icon('check', { size: 18 })}Thank you. Your message was sent to the group member.</p>` : ''}
     ${errors._form ? html`<p class="notice notice-error" role="alert">${icon('alert', { size: 18 })}${errors._form}</p>` : ''}
     <form method="post" action="${action || '#'}" class="contact-form" ${ctx.mode === 'preview' ? 'data-preview-form' : ''} novalidate>
       <div class="field">
@@ -22,9 +22,12 @@ function contactForm(ctx, { values = {}, errors = {}, sent = false } = {}) {
         ${err('name')}
       </div>
       <div class="field">
-        <label for="c-email">Email address</label>
-        <input id="c-email" name="email" type="email" required maxlength="160" autocomplete="email" value="${values.email || ''}"${described('email')}>
-        ${err('email')}
+        <label for="c-member">Group member</label>
+        <div class="select-wrap"><select id="c-member" name="member" required${described('member')}>
+          <option value="">Choose a member</option>
+          ${ctx.data.members.filter((m) => m.type === 'Team member').map((m) => html`<option value="${m.id}"${values.member === m.id ? ' selected' : ''}>${m.name}${m.role ? ` — ${m.role}` : ''}</option>`)}
+        </select>${icon('chevronDown', { size: 18 })}</div>
+        ${err('member')}
       </div>
       <div class="field">
         <label for="c-topic">Topic</label>

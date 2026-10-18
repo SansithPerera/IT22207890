@@ -172,6 +172,13 @@ function adminRoutes(router, { content }) {
     redirect(res, '/admin/messages?notice=message-deleted');
   });
 
+  // ---------------------------------------------------------------- starter content
+  router.post('/admin/reset', guard, async (req, res) => {
+    await form(req);
+    await content.resetToSeed();
+    redirect(res, '/admin?notice=reset');
+  });
+
   // ---------------------------------------------------------------- export
   router.get('/admin/export', guard, async (req, res) => {
     const ctx = await adminCtx(req);
